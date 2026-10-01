@@ -73,6 +73,28 @@ const a_copy = (an_index) => ({
 	],
 });
 
+/** An issue as a tracker holds it: a number, a state, and a filing agent's shape or none. */
+const an_issue = (an_index, over = {}) => ({
+	number: an_index,
+	title: `an opportunity ${an_index}`,
+	state: "open",
+	created_at: "2026-10-01",
+	closed_at: null,
+	carries_the_filing_format: true,
+	labels: [],
+	was_written_by_somebody: "somebody",
+	...over,
+});
+
+/**
+ * An original, holding thirty pull requests and — for the first one — an open issue and a closed
+ * one.
+ *
+ * **The issues are here so the count has something to count.** Every original in the first version of
+ * this fixture had none, which made "how many of their issues are open" a question whose answer was
+ * always zero — and a test that asks about open issues against a fixture with no open issues proves
+ * only that zero is printed.
+ */
 const an_original = (an_index, over = {}) => ({
 	owner: "steamnoid",
 	name: `an_original_number_${an_index}`,
@@ -82,13 +104,23 @@ const an_original = (an_index, over = {}) => ({
 	why_not: null,
 	what_it_says_it_is: an_index === 1 ? null : "An AI-native SDLC that shows its working.",
 	was_created_on: "2026-01-01T06:00:00Z",
-	the_issues: [],
+	the_issues:
+		an_index === 1
+			? [an_issue(10), an_issue(11, { state: "closed", closed_at: "2026-02-01" })]
+			: [],
 	the_pull_requests: Array.from({ length: 30 }, (_, an_inner) => a_pull_request(an_inner)),
 	...over,
 });
 
 const THE_COPIES = [1, 2, 3].map(a_copy);
 const THE_ORIGINALS = [1, 2, 3].map(an_original);
+
+/** The originals' issues, counted rather than written down. */
+const every_issue_of_the_originals = THE_ORIGINALS.flatMap((an_original) => an_original.the_issues);
+const how_many_issues_of_the_originals = every_issue_of_the_originals.length;
+const how_many_open_of_the_originals = every_issue_of_the_originals.filter(
+	(an_issue) => an_issue.state === "open",
+).length;
 
 /** The page, as words, from a family of the given repositories. */
 function the_page_from(a_family) {
@@ -164,6 +196,30 @@ describe("the section for the originals", () => {
 			/0 pull requests a run made on them/,
 			"the originals' section does not say how many of their pull requests were deliveries, and " +
 				"that number is the whole reason they are a separate section",
+		);
+	});
+
+	it("says how many of their issues are still open, which is the number this section was missing", () => {
+		assert.match(
+			the_page.words,
+			new RegExp(`${how_many_open_of_the_originals} open of ${how_many_issues_of_the_originals} on their trackers`),
+			"the section that holds the originals' pull requests says nothing about their issues. It " +
+				"counts merged and it counts deliveries and it never once mentions an issue — a reader " +
+				"reaching the bottom of this page could not say whether any of the repositories the " +
+				"system was built in has work still open.",
+		);
+	});
+
+	it("tells an open issue from a closed one in every row, as the copies' table above does", () => {
+		const the_one_with_issues = THE_ORIGINALS[0];
+		const how_many_of_its_issues_are_open = the_one_with_issues.the_issues.filter(
+			(an_issue) => an_issue.state === "open",
+		).length;
+		assert.match(
+			the_page.words,
+			new RegExp(`the ${how_many_of_its_issues_are_open} open issues? of ${the_one_with_issues.the_issues.length}`),
+			"no row says which of an original's issues is still open, so the Issues column is a total " +
+				"that cannot be acted on. The copies' table carries an Open column for exactly this.",
 		);
 	});
 
