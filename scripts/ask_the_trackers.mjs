@@ -193,6 +193,43 @@ function the_loop_of(a_issues, a_pull_requests) {
  * answering 404 is a rename, and neither of those means the family has five members — which is
  * the whole rule this family of pages states in its own words and then has to keep.
  */
+/**
+ * One answer made of every page it took to hold.
+ *
+ * **A page that comes back full has not answered the question.** GitHub serves a hundred items per
+ * page and says nothing about what lies beyond the one that was fetched, so a single read of a
+ * tracker with two hundred pull requests reports a hundred of them and looks like a measurement.
+ *
+ * Two repositories on this page answered with exactly a hundred, which is the size of the envelope
+ * and not the number inside it — and the page published the truncated figure with nothing to say
+ * so. A smaller number than the truth is the dangerous kind of wrong: it reads like a finding
+ * rather than like a failure.
+ *
+ * **The reading ends on a page shorter than the size asked for**, which is the only signal the API
+ * gives. A repository holding exactly a hundred ends on an empty second page, so after this a count
+ * of exactly a hundred is a count and no longer a symptom — which is why the size is the thing that
+ * ends the loop and not an item count compared against a number somebody guessed.
+ */
+export async function every_page_of(a_path, the_answer_for) {
+	const collected = [];
+	let the_page = 1;
+
+	for (;;) {
+		const an_answer = await the_answer_for(`${a_path}&per_page=${HOW_MANY_ITEMS_PER_PAGE}&page=${the_page}`);
+		if (!an_answer.was_read) {
+			return { was_read: false, why_not: an_answer.why_not, the_answer: null, how_many_pages: the_page - 1 };
+		}
+		collected.push(...an_answer.the_answer);
+		if (an_answer.the_answer.length < HOW_MANY_ITEMS_PER_PAGE) {
+			return { was_read: true, why_not: null, the_answer: collected, how_many_pages: the_page };
+		}
+		the_page += 1;
+	}
+}
+
+/** GitHub's own ceiling for a list endpoint, and the number a short page is measured against. */
+export const HOW_MANY_ITEMS_PER_PAGE = 100;
+
 export async function what_the_trackers_say(the_family, the_answer_for) {
 	const the_readings = [];
 
@@ -212,11 +249,13 @@ export async function what_the_trackers_say(the_family, the_answer_for) {
 			continue;
 		}
 
-		const the_issues_answer = await the_answer_for(
-			`repos/${a_project.owner}/${a_project.name}/issues?state=all&per_page=100`,
+		const the_issues_answer = await every_page_of(
+			`repos/${a_project.owner}/${a_project.name}/issues?state=all`,
+			the_answer_for,
 		);
-		const the_pulls_answer = await the_answer_for(
-			`repos/${a_project.owner}/${a_project.name}/pulls?state=all&per_page=100`,
+		const the_pulls_answer = await every_page_of(
+			`repos/${a_project.owner}/${a_project.name}/pulls?state=all`,
+			the_answer_for,
 		);
 
 		// **A tracker that could not be read is not a tracker with nothing on it.** GitHub answers

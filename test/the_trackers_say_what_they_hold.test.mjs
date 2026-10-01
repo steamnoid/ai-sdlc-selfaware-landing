@@ -58,8 +58,17 @@ function a_reader_holding(a_table) {
 	};
 }
 
-const the_issues_url = "repos/steamnoid/a_project/issues?state=all&per_page=100";
-const the_pulls_url = "repos/steamnoid/a_project/pulls?state=all&per_page=100";
+/**
+ * The URLs the collector asks for, page size and page number included.
+ *
+ * **They carry `page=` now, and this test had to follow.** The collector walks pages until one comes
+ * back short, so every request now ends `&per_page=100&page=1` — and a fixture keyed on the old URL
+ * answered nothing, which showed up as three tests failing about trackers holding items this
+ * repository's own fixture says they do not hold. A test double that no longer matches the URL is
+ * not a neutral thing: it is a test that stops asking.
+ */
+const the_issues_url = "repos/steamnoid/a_project/issues?state=all&per_page=100&page=1";
+const the_pulls_url = "repos/steamnoid/a_project/pulls?state=all&per_page=100&page=1";
 const the_itself_url = "repos/steamnoid/a_project";
 
 /** One project as the hand-written list writes it, so a test is about the reading and not the shape. */
