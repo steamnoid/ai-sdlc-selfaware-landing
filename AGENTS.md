@@ -99,6 +99,14 @@ lying, and they are the reason the existing pages are worth anything.
    was `/ai-sdlc-landing` for three published runs, because the file came from that repository.
    `base` is not a default; it is a page saying where it is served from, and it is one value per
    repository in this family.
+9. **If a number is exactly as large as the thing that carries it, it is not a measurement.** A
+   list endpoint serves a hundred items per page and says nothing about what lies beyond the one
+   fetched, so a repository with 152 pull requests answers with 100 — and 100 is a perfectly
+   ordinary number to publish. Two of the fourteen were doing it, and the page said 404 pull
+   requests where there were 472, with no red anywhere. **A count smaller than the truth is the
+   dangerous kind of wrong:** every other failure here announces itself, and this one reads like a
+   finding. The reading ends on a page shorter than the size asked for, so a count of exactly a
+   hundred is a count only because a second, empty page proved it.
 
 ---
 
