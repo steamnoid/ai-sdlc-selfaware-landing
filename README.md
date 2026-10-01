@@ -2,7 +2,7 @@
 
 **The page:** <https://steamnoid.github.io/ai-sdlc-selfaware-landing>
 
-Six repositories where [`ai-sdlc-os`](https://github.com/steamnoid/ai-sdlc-os) and its ports have
+Repositories where [`ai-sdlc-os`](https://github.com/steamnoid/ai-sdlc-os) and its ports have
 been pointed at their own issue trackers. This repository is the page that says what each one has
 produced — and every fact on it was read out of the six rather than typed here.
 
@@ -22,12 +22,12 @@ bestof-fast-selfaware          the fast variant, on its own tracker
 > **A project is read, or the page says in words that it could not be.**
 
 The first is the rule the whole family holds itself to. The second exists because this page serves
-six repositories rather than one: a page about one can treat a failed read as fatal, while a page
+many repositories rather than one: a page about one can treat a failed read as fatal, while a page
 about six would go down for everybody because one tracker answered 403.
 
 ## What the page can tell you, and what it cannot
 
-**It reads a tracker. Nothing on these six trackers records who wrote what.** Three signals were
+**It reads a tracker. Nothing on these trackers records who wrote what.** Three signals were
 looked for:
 
 | the signal | what the six hold |
@@ -57,7 +57,7 @@ through an edit in it.
 
 ```bash
 npm ci            # the lockfile is committed
-npm run collect   # read the six trackers — the only thing that needs a token
+npm run collect   # read the trackers — the only thing that needs a token
 npm test          # the suite: no network, no credential
 ./scripts/gate    # the suite and a build with no state at all
 ```

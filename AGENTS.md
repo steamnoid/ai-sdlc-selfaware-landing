@@ -1,6 +1,6 @@
 # AGENTS.md — `ai-sdlc-selfaware-landing`
 
-A public page about six repositories, and what each one has produced since the system began
+A public page about a family of repositories, and what each one has produced since the system began
 working on itself. **Live:** <https://steamnoid.github.io/ai-sdlc-selfaware-landing>
 
 ---
@@ -40,7 +40,7 @@ GitHub API.
 
 # The finding the page leads with, and why it is not a design failure
 
-**Nothing on these six trackers records who wrote what.** Three signals were looked for and three
+**Nothing on these trackers records who wrote what.** Three signals were looked for and three
 are absent:
 
 | the signal | what the six hold |
@@ -61,9 +61,9 @@ text of an issue would tell the two apart. So an item is labelled *carries the s
 written in*, and no more is claimed about it.
 
 **The one thing that is a real record is each repository's own description**, and it is quoted
-verbatim rather than summarised. Six of six state in their own words that the system works on them,
-and that is the only statement on this page about authorship — attributed to the repository that
-makes it.
+verbatim rather than summarised. What they say varies, so this page quotes each one and states
+nothing about what any of them means — that is the only kind of statement about authorship it can
+keep.
 
 ---
 
@@ -130,7 +130,7 @@ with one extra element is not a shared layout. The gap is the family's, not this
 
 ```bash
 npm ci                     # the lockfile is committed
-npm run collect            # read the six trackers — needs a token, and this is the only thing that does
+npm run collect            # read the trackers — needs a token, and this is the only thing that does
 npm run build              # the page, from the state
 npm test                   # the suite: no network, no credential
 ./scripts/gate             # the suite and a build with no state at all
