@@ -90,6 +90,39 @@ lying, and they are the reason the existing pages are worth anything.
 6. **No number in a test either.** The first version of the page test typed `3 issues` against a
    fixture holding two, which is the disease the page exists to prevent, written into the file that
    checks it.
+7. **Asserting the markup is not asserting the page.** This page carried the family's classes in
+   its markup and every test agreed, for three runs, while no browser could apply them: the
+   stylesheet was requested from a sibling's address and GitHub answered 404. **A class name is a
+   claim the template makes; a stylesheet that loads is a claim the deployment has to keep.** Only
+   the second is what a reader sees.
+8. **A copied config file carries the copied repository's address.** `base` in `astro.config.mjs`
+   was `/ai-sdlc-landing` for three published runs, because the file came from that repository.
+   `base` is not a default; it is a page saying where it is served from, and it is one value per
+   repository in this family.
+
+---
+
+# The chrome is the family's, and there is no layout file
+
+**This page's chrome matches `ai-sdlc-os-landing` and `ai-sdlc-landing` character for character** —
+the paper, the sticky blurred header, the `ASD` mark, the navigation's size and spacing, and the
+author between the description and `og:type`. Those two pages agree on all of it, which is what
+makes a contract; `ai-sdlc-bestof-landing` has a third navigation and a fourth favicon, and
+`ai-sdlc-app-rs-plus-landing` is a deliberately dark page and not this family at all.
+
+**The contract is written in `test/the_page_carries_the_family_chrome.test.mjs`, not read from a
+sibling.** No landing here has a suite that opens another one's files: each deploys its own Pages
+site from its own clone, so CI has no sibling on disk and a test looking for one would have to skip —
+and a skipped test is a claim with no witness.
+
+**There is deliberately no `src/layouts/` here.** Four repositories in this family write their
+chrome into `index.astro` and none has a layout component. Extracting one in the newest of them
+would make it the first component and the fifth inline copy, with nothing able to use it. What is
+shared is the chrome; a file would have been the fifth thing that looks like it is shared.
+
+**The link from the header to this repository went when the header was aligned**, and it is worth
+knowing it went. No page in this family links to its own repository from its header, so a layout
+with one extra element is not a shared layout. The gap is the family's, not this page's.
 
 ---
 
@@ -108,6 +141,12 @@ Actions mints is already there — no secret is configured anywhere in this repo
 the API allows sixty requests an hour *per address*, and a runner's address is shared with whatever
 else GitHub is running on it, so about twenty reads fit inside that budget only if nothing else has
 spent it.
+
+**The suite is serial on purpose.** `--test-concurrency=1` is a constraint of this design and not a
+preference about speed: every page test swaps `src/state/the_family.json` into place and two such
+tests at once are two builds writing one file — while Astro also shares its cache directory. Run in
+parallel it gave `ENOENT … rename .astro/.prerender/_astro/index.css` and reported a failing *file*
+with every individual test inside it passing. The flag lives in `package.json`, so it runs.
 
 **Read the trackers, and not the checkouts.** `AISDLC_WHETHER=` chooses nothing here: there is
 nothing to point at. Six URLs are in `scripts/ask_the_trackers.mjs` and they are the whole
