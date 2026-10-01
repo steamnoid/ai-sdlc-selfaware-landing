@@ -13,7 +13,7 @@ here=$(cd "$(dirname "$0")/.." && pwd)
 cd "$here"
 
 echo "── the suite: no network, no credential ──"
-node --test --test-concurrency=1 test/
+node --test --test-concurrency=1 test/*.test.mjs
 
 echo
 echo "── the build a fresh clone does, with no state ──"

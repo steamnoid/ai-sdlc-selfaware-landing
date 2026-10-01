@@ -11,7 +11,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "node --test --test-concurrency=1 test/",
+    "test": "node --test --test-concurrency=1 test/*.test.mjs",
     "collect": "node scripts/ask_the_trackers.mjs --github-api \"${GITHUB_API:-https://api.github.com}\"",
     "gate": "./scripts/gate"
   },
