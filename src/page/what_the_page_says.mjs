@@ -169,23 +169,68 @@ export function what_the_page_says(the_state) {
 	if (the_state === null || the_state === undefined) {
 		throw new TheStateIsNotReadableError("there is no state at src/state/the_family.json");
 	}
-	if (!Array.isArray(the_state.the_family) || the_state.the_family.length === 0) {
+	if (!Array.isArray(the_state.the_family)) {
 		return {
 			verdict: "nothing to say",
+			the_heading: "No state, so nothing to say",
 			the_projects: [],
 			the_attribution: what_the_attribution_says([]),
+			when_was_it_read: the_state.the_build?.read_at ?? null,
 			why_not:
-				"no state at src/state/the_family.json, so no tracker was read. The state is a build " +
-				"artefact and is never committed, so this is what a fresh clone has. Run " +
-				"`npm run collect` to read the six trackers and build the page from them.",
+				"the state is there but its the_family is not a list, so nothing can be read out of " +
+				"it. Run `npm run collect` to read the trackers and write one this page can read.",
+		};
+	}
+if (the_state.the_family.length === 0) {
+		/**
+		 * **A reading that found nothing, which is not a missing reading — and not a stand-in either.**
+		 *
+		 * This branch used to be the one above, and every sentence in it was false here: the file is
+		 * on disk, and this is not the fresh-clone render. What *is* true is the one interesting
+		 * fact — the trackers were read, they answered, and every one of them held nothing — and the
+		 * reading's own timestamp is kept, because "read at" is the only evidence that the read
+		 * happened rather than that somebody meant to.
+		 *
+		 * **Which is why the timestamp is what this branch keys on.** A stand-in for a missing state
+		 * is `{"the_family": []}` and nothing else, so it lands here too and would claim the
+		 * trackers answered when nobody asked them. A reading is only a reading if it says when it
+		 * happened.
+		 */
+		const when_was_it_read = the_state.the_build?.read_at ?? null;
+		if (when_was_it_read === null) {
+			return {
+				verdict: "nothing to say",
+				the_heading: "No state, so nothing to say",
+				the_projects: [],
+				the_attribution: what_the_attribution_says([]),
+				when_was_it_read: null,
+				why_not:
+					"no state at src/state/the_family.json, so no tracker was read. The state is a build " +
+					"artefact and is never committed, so this is what a fresh clone has. Run " +
+					"`npm run collect` to read the trackers and build the page from them.",
+			};
+		}
+		return {
+			verdict: "read nothing",
+			the_heading: "The trackers were read, and every one of them held nothing",
+			the_projects: [],
+			the_attribution: what_the_attribution_says([]),
+			when_was_it_read,
+			why_not:
+				"the trackers were read and every one of them held nothing. That is a fact about the " +
+				"trackers and not an absence of one: a repository answers with an empty list when it " +
+				"has no issues and no pull requests, and a page that renders that as nothing to " +
+				"say is reporting its own emptiness as theirs. Run `npm run collect` to read them again.",
 		};
 	}
 
 	const the_projects = the_state.the_family.map(what_one_project_says);
 	return {
 		verdict: "read",
+		the_heading: null,
 		the_projects,
 		the_attribution: what_the_attribution_says(the_state.the_family),
+		when_was_it_read: the_state.the_build?.read_at ?? null,
 		why_not: null,
 	};
 }

@@ -1,10 +1,10 @@
 ---
 /**
- * Six copies of the ai-sdlc system, and what each one has produced since it began working on
+ * The copies of the ai-sdlc system, and what each one has produced since it began working on
  * itself. Every number here was read out of a GitHub tracker at build time.
  *
  * **The first thing this page says is what it cannot tell you.** A page about what a workflow
- * delivered invites the question "delivered by what, though" — and on these six trackers there
+ * delivered invites the question "delivered by what, though" — and on these trackers there
  * is nothing that answers it: no pull request sits on a branch a delivery uses, one account wrote
  * every item, and only five of fifty-two carry the shape the filing agent writes. So the page
  * prints the counts and refuses the authorship, and it does that in the first section rather than
@@ -35,6 +35,16 @@ function how_many_more(how_many, how_many_shown) {
 	return how_many - how_many_shown;
 }
 
+/**
+ * **How many copies this page is about, counted from what it is holding.**
+ *
+ * Six sentences in this template used to carry that number as a word, in the title, the meta
+ * description, the label and three claims in the prose. This is the rule those six broke: on
+ * `ai-sdlc-landing` four hand-written numbers became false the day a repository answered 404, and the
+ * fifth was wrong on the live site the day it was written. A number word is a number nobody counts.
+ */
+const how_many_copies = the_page.verdict === "read" ? the_page.the_projects.length : 0;
+
 const when_was_it_read = the_state.the_build?.read_at
 	? new Date(the_state.the_build.read_at).toISOString().slice(0, 16).replace("T", " ") + " UTC"
 	: null;
@@ -45,14 +55,14 @@ const when_was_it_read = the_state.the_build?.read_at
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
-		<title>ai-sdlc, working on itself — six copies</title>
+		<title>ai-sdlc, working on itself — {how_many_copies} copies</title>
 		<meta
 			name="description"
-			content="Six copies of the ai-sdlc system, each the copy the system briefs itself against. What each has filed and delivered, read from the trackers, and what the trackers cannot say about who wrote it."
+			content="{how_many_copies} copies of the ai-sdlc system, each the copy the system briefs itself against. What each has filed and delivered, read from the trackers, and what the trackers cannot say about who wrote it."
 		/>
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content="https://steamnoid.github.io/ai-sdlc-selfaware-landing" />
-		<meta property="og:title" content="ai-sdlc, working on itself — six copies" />
+		<meta property="og:title" content="ai-sdlc, working on itself — {how_many_copies} copies" />
 		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}/favicon.svg`} />
 		<style>
 			@import "tailwindcss";
@@ -76,14 +86,14 @@ const when_was_it_read = the_state.the_build?.read_at
 			<main>
 				<section class="border-b border-zinc-200">
 					<div class="max-w-6xl mx-auto px-6 py-12 md:py-16">
-						<p class="text-xs uppercase tracking-wider text-zinc-500">Six copies</p>
+						<p class="text-xs uppercase tracking-wider text-zinc-500">{how_many_copies} copies</p>
 						<h1 class="mt-3 text-4xl md:text-5xl font-semibold tracking-tight">
 							The system, working on copies of itself
 						</h1>
 						<p class="mt-5 text-[17px] leading-7 text-zinc-600 max-w-2xl">
 							<span class="font-medium text-zinc-900">ai-sdlc</span> is a system that reads a public
 							repository, asks bounded questions about it, has a person approve every answer, and
-							delivers a pull request. Six of the projects on this page exist to be its target: each is
+							delivers a pull request. {how_many_copies} of the projects on this page exist to be its target: each is
 							a copy of a project it was written from, and the copy is the point — it is where a run's
 							findings and a run's deliveries land.
 						</p>
@@ -135,7 +145,7 @@ const when_was_it_read = the_state.the_build?.read_at
 								<p class="mt-3 text-[13px] leading-6 text-zinc-600">
 									<code class="font-mono text-[12px]">ai-sdlc-os</code> names its deliveries
 									<code class="font-mono text-[12px]">aisdlc/issue-&lt;n&gt;-&lt;run id&gt;</code>, so a pull
-									request on such a branch was made by a run. Not one on the six is on a branch like
+									request on such a branch was made by a run. Not one on the {how_many_copies} is on a branch like
 									that — every merged one is named after what it changed, which is what a person pushing
 									a branch calls it.
 								</p>
@@ -146,9 +156,10 @@ const when_was_it_read = the_state.the_build?.read_at
 									{the_attribution.how_many_people_wrote_anything}
 								</p>
 								<p class="mt-3 text-[13px] leading-6 text-zinc-600">
-									One account is the author of every issue and every pull request on all six
+									One account is the author of every issue and every pull request on all {how_many_copies}
+										trackers
 									trackers, so <em>author</em> separates nothing. The system pushes as the person who is
-									operating it, which is also true of the commits on all six, and no tracker records
+									operating it, which is also true of the commits on all {how_many_copies}, and no tracker records
 									the difference.
 								</p>
 							</div>
@@ -333,8 +344,15 @@ const when_was_it_read = the_state.the_build?.read_at
 			</main>
 		) : (
 			<main class="max-w-3xl mx-auto px-6 py-16">
-				<h1 class="text-3xl font-semibold tracking-tight">No state, so nothing to say</h1>
+				<!-- **The heading is the projection's, and not a literal here.**
+				     Two of the three things this branch renders are a missing state and a reading that
+				     held nothing, and a heading written into the template went on saying the first of
+				     them while the sentence under it said the second. -->
+				<h1 class="text-3xl font-semibold tracking-tight">{the_page.the_heading}</h1>
 				<p class="mt-4 text-zinc-600 text-[15px] leading-7">{the_page.why_not}</p>
+				{the_page.when_was_it_read && (
+					<p class="mt-3 text-xs text-zinc-400">Read {the_page.when_was_it_read.replace("T", " ").slice(0, 16)} UTC</p>
+				)}
 			</main>
 		)}
 

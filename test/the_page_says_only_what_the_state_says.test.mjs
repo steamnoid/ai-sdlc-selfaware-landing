@@ -18,6 +18,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
+import { what_the_page_says } from "../src/page/what_the_page_says.mjs";
+
 const here = dirname(fileURLToPath(import.meta.url));
 const at = join(here, "..");
 
@@ -87,6 +89,7 @@ const THE_STATE = {
 		a_project(),
 		a_project({ name: "a_second_project", a_copy_of: "another-project", the_issues: [], the_pull_requests: [] }),
 		a_project({ name: "an_unreadable_project", was_read: false, why_not: "GitHub answered 403", the_issues: [], the_pull_requests: [] }),
+		a_project({ name: "another_unreadable_project", was_read: false, why_not: "the repository answered 404", the_issues: [], the_pull_requests: [] }),
 	],
 };
 
@@ -239,9 +242,10 @@ describe("a page built from a state that was read", () => {
 	});
 
 	describe("and every project keeps its place", () => {
-		it("prints the project that could not be read, with the reason", () => {
+		it("prints every project that could not be read, with its own reason", () => {
 			assert.match(the_page.words, /an_unreadable_project/, "a project that could not be read was dropped");
-			assert.match(the_page.words, /not read — GitHub answered 403/, "the reason it could not be read is not on the page");
+			assert.match(the_page.words, /not read — GitHub answered 403/, "the reason one could not be read is not on the page");
+			assert.match(the_page.words, /not read — the repository answered 404/, "the reason the other could not be read is not on the page");
 		});
 
 		it("quotes what each project says about itself, rather than summarising it", () => {
@@ -285,6 +289,50 @@ describe("a page built from a state that was read", () => {
 	});
 });
 
+/**
+ * **Four projects, so the family count is a number no other sentence in the page uses.**
+ *
+ * The page says in words how many signals it checks — three — and how many people must approve an
+ * answer — one. A fixture of three projects made the word for the family count identical to the word
+ * for the signal count, and a rule that forbids a word cannot tell a count of copies from a count of
+ * signals. Four cannot collide with either, so the rule below is about the family and nothing else.
+ */
+
+const NUMBER_WORDS = [
+	"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+	"eleven", "twelve",
+];
+
+describe("and its own prose holds no number it did not count", () => {
+	const the_page = the_page_built_from(THE_STATE);
+	const how_many_copies = THE_STATE.the_family.length;
+
+	it("counts the copies in its title, its label and its opening sentence", () => {
+		assert.match(the_page.words, new RegExp(`${how_many_copies} copies`), "the page never says how many copies it is about in figures");
+		assert.match(
+			the_page.words,
+			new RegExp(`${how_many_copies} of the projects on this page`),
+			"the opening sentence does not carry the counted number",
+		);
+	});
+
+	it("does not spell the number of copies as a word", () => {
+		// **One word, and only the word this fixture's count is written as.** The first version
+		// forbade every number word from zero to twelve, and it forbade good English: this page says
+		// "has one person approve every answer" and "Not one on the 6 is on a branch like that", and
+		// neither of those is a count of anything. A rule that cannot be told apart from ordinary
+		// prose is a rule a writer learns to work around.
+		const the_word = NUMBER_WORDS[how_many_copies];
+		assert.doesNotMatch(
+			the_page.words,
+			new RegExp(`\\b${the_word}\\b`, "i"),
+			`the page's own prose writes "${the_word}" where the number of copies belongs. Six sentences ` +
+				"on the first live build said how many copies there are as a word, and those are exactly " +
+				"the sentences that were wrong on ai-sdlc-landing the day a repository answered 404.",
+		);
+	});
+});
+
 describe("a page built with no state at all", () => {
 	const the_page = the_page_built_from(null);
 
@@ -305,5 +353,52 @@ describe("a page built with no state at all", () => {
 				`the page printed ${a_thing}, which is what a field nobody read renders as`,
 			);
 		}
+	});
+});
+/**
+ * **A state that was read and held nothing is not a state that is missing.**
+ *
+ * These three sit in one branch in the projection: no file at all, a file holding no projects, and a
+ * file holding an empty list. Two of them are genuinely different and both statements in that branch
+ * are false for the second one — "no state at src/state/the_family.json" is a claim about the disk
+ * while the file is on it, and "this is what a fresh clone has" is a claim about the renderer when
+ * the other branch renders differently. It is the same defect this repository's sibling fixed an hour
+ * before this file was written, in the same family, about the same words.
+ */
+describe("a state that was read and held no projects", () => {
+	const what_it_says = what_the_page_says({
+		the_build: { read_at: "2026-10-01T09:00:00.000Z" },
+		the_family: [],
+	});
+
+	it("keeps the reading's own timestamp, so a reader knows the read happened", () => {
+		assert.equal(
+			what_it_says.when_was_it_read,
+			"2026-10-01T09:00:00.000Z",
+			"the projection drops the reading's timestamp when the reading held nothing, so the one " +
+				"fact the state does hold — that it was read, and when — is the fact it throws away",
+		);
+	});
+});
+
+describe("a page built from a state that was read and held nothing", () => {
+	const the_page = the_page_built_from({
+		the_build: { read_at: "2026-10-01T09:00:00.000Z" },
+		the_family: [],
+	});
+
+	it("does not print the no-state heading beside a reason saying the trackers were read", () => {
+		assert.doesNotMatch(
+			the_page.words,
+			/No state, so nothing to say/i,
+			"the page's heading claims there is no state while the sentence under it says the trackers " +
+				"were read. Splitting the projection was half the fix: the heading was written into the " +
+				"template as a literal, so it went on telling the first of the two stories regardless.",
+		);
+	});
+
+	it("prints the reason the reading held nothing", () => {
+		assert.match(the_page.words, /trackers were read and every one of them held nothing/, "the reason is not on the page");
+		assert.match(the_page.words, /2026-10-01 09:00 UTC/, "the reading's own time is not on the page, so nothing says the read happened");
 	});
 });

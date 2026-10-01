@@ -152,8 +152,12 @@ describe("a state that was not read, and a state that read nothing", () => {
 	it("answers a state holding no projects with the reason, and not with zeroes", () => {
 		const the_page = what_the_page_says({ the_build: { read_at: "2026-10-01T00:00:00Z" }, the_family: [] });
 
-		assert.equal(the_page.verdict, "nothing to say");
-		assert.match(the_page.why_not, /no state at/, "a state that was read and held nothing is reported as no state");
+		// **This test asserted the wrong thing for a week of its own existence.** It demanded that a
+		// state which was read and held nothing report itself as `nothing to say` with "no state at"
+		// in the reason — the file was on disk, and a page that says it is not is lying about the one
+		// thing a reader can check for themselves.
+		assert.equal(the_page.verdict, "read nothing");
+		assert.doesNotMatch(the_page.why_not, /no state at/, "a state that was read and held nothing is reported as no state");
 	});
 
 	it("keeps a project that could not be read, with its reason", () => {

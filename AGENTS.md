@@ -81,7 +81,9 @@ lying, and they are the reason the existing pages are worth anything.
 3. **A refusal is a value, not an absence**, and it is never a zero.
 4. **The state is a build artefact and is never committed**, so a fresh clone has none and the page
    says so rather than rendering a fossil. **The gate proves that build**, because it is the one
-   that had never been run.
+   that had never been run. **A stand-in is not a reading.** The stand-in for a missing state is
+   `{"the_family": []}` and nothing else, so it is indistinguishable from a real reading that found
+   nothing — and the reading is only a reading if it says when it happened.
 5. **A rule that is too loose is worse than no rule.** `is_a_delivery_branch` first accepted any
    suffix and read `aisdlc/issue-12-someone-elses-work` as a delivery — which is the one rule on
    this page that could hand a delivery to a branch somebody pushed by hand.
