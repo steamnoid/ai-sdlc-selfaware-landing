@@ -60,6 +60,7 @@ const when_was_it_read = the_state.the_build?.read_at
 			name="description"
 			content="{how_many_copies} copies of the ai-sdlc system, each the copy the system briefs itself against. What each has filed and delivered, read from the trackers, and what the trackers cannot say about who wrote it."
 		/>
+		<meta name="author" content="Krzysztof Paliga" />
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content="https://steamnoid.github.io/ai-sdlc-selfaware-landing" />
 		<meta property="og:title" content="ai-sdlc, working on itself — {how_many_copies} copies" />
@@ -68,13 +69,27 @@ const when_was_it_read = the_state.the_build?.read_at
 			@import "tailwindcss";
 		</style>
 	</head>
-	<body class="bg-white text-zinc-900 antialiased">
-		<header class="border-b border-zinc-200">
-			<div class="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between gap-3 text-xs text-zinc-500">
-				<a href="https://github.com/steamnoid/ai-sdlc-selfaware-landing" class="hover:text-zinc-900 transition">
-					ai-sdlc — working on itself
-				</a>
-				<nav class="flex gap-3">
+	<!--
+		The chrome below is the family's, character for character, and the test says which family it is
+		taken from. It was `bg-white`, a header that scrolled away, a smaller nav and a name that was
+		a link to this repository — so this page looked like a fifth page of this family rather than
+		the fourth, and a reader arriving at it from the others saw a different site.
+
+		**The link to this repository went with it, and that is a real loss.** No page in this family
+		links to its own repository from its header, and a layout with one extra element is not a
+		shared layout. The gap it leaves is the family's, not this page's, and it is worth deciding
+		once for all of them rather than twice.
+	-->
+	<body class="bg-[#fafaf9] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
+		<header class="sticky top-0 z-50 backdrop-blur bg-white/85 border-b border-zinc-200">
+			<div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
+				<div class="flex items-center gap-2.5 min-w-0">
+					<div class="w-7 h-7 rounded-md bg-zinc-900 flex items-center justify-center text-white text-[10px] font-bold tracking-widest shrink-0">
+						ASD
+					</div>
+					<span class="text-sm font-semibold tracking-tight truncate">ai-sdlc, working on itself</span>
+				</div>
+				<nav class="hidden md:flex items-center gap-6 text-sm text-zinc-600 shrink-0">
 					<a href="#attribution" class="hover:text-zinc-900 transition">What this cannot tell you</a>
 					<a href="#loop" class="hover:text-zinc-900 transition">The loop</a>
 					<a href="#family" class="hover:text-zinc-900 transition">Each copy</a>
