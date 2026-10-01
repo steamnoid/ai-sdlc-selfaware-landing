@@ -25,13 +25,53 @@ import { dirname, resolve } from "node:path";
  * deliveries, whether a filing is the workflow's shape — is read out of GitHub at build time,
  * so the list of where to look is here and nothing about what is there is.
  */
+/**
+ * The two kinds, spelled exactly as the page and the state spell them.
+ *
+ * **A copy is what this page is about; an original is where it came from.** A copy's tracker is
+ * where a run's work lands. An original's tracker holds the human work of building the system —
+ * 393 merged pull requests at the time of writing against the copies' 25 — so the two are never
+ * added together anywhere, and the kind travels with the reading even when the reading is refused.
+ */
+export const A_COPY_THE_SYSTEM_BRIEFS_ITSELF_AGAINST = "a copy the system briefs itself against";
+export const THE_ORIGINAL_A_COPY_WAS_MADE_FROM = "the original a copy was made from";
+
+/**
+ * Fourteen repositories, in one list, each saying which kind it is.
+ *
+ * **One list and not two, because the place that counts is where this would go wrong.** The page
+ * sums over whatever it is handed; the first version of this declaration was copies only, and
+ * adding the originals to a second list that the same sum also walked is a mistake waiting to be
+ * made. The kind on each entry is what stops it, and
+ * `test/the_family_declares_what_it_is.test.mjs` holds two invariants that keep the list honest: every
+ * original is some copy's `a_copy_of`, and every copy's `a_copy_of` is on the page.
+ *
+ * **The sixth copy and its seventh original were added together**, because `ai-sdlc-bestof-fast-alt`
+ * is the repository `ai-sdlc-bestof-fast-selfaware-alt` was made from — the same shape as
+ * `ai-sdlc-bestof-fast` and `ai-sdlc-bestof-fast-selfaware`. An original with nothing copied from
+ * it would be a row with no argument for being a row.
+ */
 export const THE_FAMILY_THAT_BRIEFS_ITSELF = [
-	{ owner: "steamnoid", name: "ai-sdlc-os-selfaware", a_copy_of: "ai-sdlc-os" },
-	{ owner: "steamnoid", name: "ai-sdlc-os-plus-selfaware", a_copy_of: "ai-sdlc-os-plus" },
-	{ owner: "steamnoid", name: "ai-sdlc-app-rs-selfaware", a_copy_of: "ai-sdlc-app-rs" },
-	{ owner: "steamnoid", name: "ai-sdlc-app-rs-plus-selfaware", a_copy_of: "ai-sdlc-app-rs-plus" },
-	{ owner: "steamnoid", name: "ai-sdlc-bestof-selfaware", a_copy_of: "ai-sdlc-bestof" },
-	{ owner: "steamnoid", name: "ai-sdlc-bestof-fast-selfaware", a_copy_of: "ai-sdlc-bestof-fast" },
+	{ owner: "steamnoid", name: "ai-sdlc-os-selfaware", what_it_is: A_COPY_THE_SYSTEM_BRIEFS_ITSELF_AGAINST, a_copy_of: "ai-sdlc-os" },
+	{ owner: "steamnoid", name: "ai-sdlc-os-plus-selfaware", what_it_is: A_COPY_THE_SYSTEM_BRIEFS_ITSELF_AGAINST, a_copy_of: "ai-sdlc-os-plus" },
+	{ owner: "steamnoid", name: "ai-sdlc-app-rs-selfaware", what_it_is: A_COPY_THE_SYSTEM_BRIEFS_ITSELF_AGAINST, a_copy_of: "ai-sdlc-app-rs" },
+	{ owner: "steamnoid", name: "ai-sdlc-app-rs-plus-selfaware", what_it_is: A_COPY_THE_SYSTEM_BRIEFS_ITSELF_AGAINST, a_copy_of: "ai-sdlc-app-rs-plus" },
+	{ owner: "steamnoid", name: "ai-sdlc-bestof-selfaware", what_it_is: A_COPY_THE_SYSTEM_BRIEFS_ITSELF_AGAINST, a_copy_of: "ai-sdlc-bestof" },
+	{ owner: "steamnoid", name: "ai-sdlc-bestof-fast-selfaware", what_it_is: A_COPY_THE_SYSTEM_BRIEFS_ITSELF_AGAINST, a_copy_of: "ai-sdlc-bestof-fast" },
+	{
+		owner: "steamnoid",
+		name: "ai-sdlc-bestof-fast-selfaware-alt",
+		what_it_is: A_COPY_THE_SYSTEM_BRIEFS_ITSELF_AGAINST,
+		a_copy_of: "ai-sdlc-bestof-fast-alt",
+	},
+
+	{ owner: "steamnoid", name: "ai-sdlc-os", what_it_is: THE_ORIGINAL_A_COPY_WAS_MADE_FROM },
+	{ owner: "steamnoid", name: "ai-sdlc-os-plus", what_it_is: THE_ORIGINAL_A_COPY_WAS_MADE_FROM },
+	{ owner: "steamnoid", name: "ai-sdlc-app-rs", what_it_is: THE_ORIGINAL_A_COPY_WAS_MADE_FROM },
+	{ owner: "steamnoid", name: "ai-sdlc-app-rs-plus", what_it_is: THE_ORIGINAL_A_COPY_WAS_MADE_FROM },
+	{ owner: "steamnoid", name: "ai-sdlc-bestof", what_it_is: THE_ORIGINAL_A_COPY_WAS_MADE_FROM },
+	{ owner: "steamnoid", name: "ai-sdlc-bestof-fast", what_it_is: THE_ORIGINAL_A_COPY_WAS_MADE_FROM },
+	{ owner: "steamnoid", name: "ai-sdlc-bestof-fast-alt", what_it_is: THE_ORIGINAL_A_COPY_WAS_MADE_FROM },
 ];
 
 /** How the workflow writes a filing: a heading, then named sections under it. */
