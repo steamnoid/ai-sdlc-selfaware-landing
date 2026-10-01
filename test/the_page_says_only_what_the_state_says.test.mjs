@@ -24,9 +24,21 @@ const here = dirname(fileURLToPath(import.meta.url));
 const at = join(here, "..");
 
 /** A project as the reading holds it, with a tracker that has something on it. */
+/**
+ * A copy the system briefs itself against, as the reading holds it.
+ *
+ * **`what_it_is` is on every fixture in this file and that is not tidiness.** The attribution counts
+ * copies and refuses anything else, so a fixture that forgot the kind would be counted as zero
+ * copies and every number below would be wrong in the direction of looking empty — which is the
+ * failure a page about attribution cannot have.
+ */
+const a_copy = "a copy the system briefs itself against";
+
 const a_project = (over = {}) => ({
 	owner: "steamnoid",
 	name: "a_project",
+	what_it_is: a_copy,
+	a_copy_of: "the-project-it-copies",
 	url: "https://github.com/steamnoid/a_project",
 	a_copy_of: "the-project-it-copies",
 	was_read: true,
@@ -141,6 +153,16 @@ const how_many_with_the_shape = every_issue.filter((an_issue) => an_issue.carrie
 const how_many_pull_requests = every_pull_request.length;
 const how_many_merged = every_pull_request.filter((a_pull) => a_pull.was_merged !== null).length;
 const how_many_delivered = every_pull_request.filter((a_pull) => a_pull.on_a_delivery_branch === true).length;
+/**
+ * **Kinds, counted from the fixture's own declarations.**
+ *
+ * The first version of this derived the repository total by adding the unread copies to the copies,
+ * which counts them twice — an unread copy is still a copy, it simply has nothing to say. Two kinds
+ * is what this page counts, so two kinds is what the fixture is asked for.
+ */
+const how_many_originals = THE_STATE.the_family.filter(
+	(a_project) => a_project.what_it_is === "the original a copy was made from",
+).length;
 
 describe("a page built from a state that was read", () => {
 	const the_page = the_page_built_from(THE_STATE);
@@ -273,10 +295,18 @@ describe("and its own prose holds no number it did not count", () => {
 
 	it("counts the copies in its title, its label and its opening sentence", () => {
 		assert.match(the_page.words, new RegExp(`${how_many_copies} copies`), "the page never says how many copies it is about in figures");
+		/**
+		 * **The sentence changed its wording once and its job did not.** It used to read "N of the
+		 * projects on this page exist to be its target", which was true of six copies on a page of
+		 * six. The page went on to hold the originals too, so it now counts both kinds — and a test
+		 * pinned to the old wording would have failed for the page being right.
+		 */
 		assert.match(
 			the_page.words,
-			new RegExp(`${how_many_copies} of the projects on this page`),
-			"the opening sentence does not carry the counted number",
+			new RegExp(
+				`${how_many_copies + how_many_originals} repositories, ${how_many_copies} of them working on themselves`,
+			),
+			"the opening sentence does not carry the counted numbers of both kinds",
 		);
 	});
 

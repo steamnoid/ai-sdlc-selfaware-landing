@@ -40,6 +40,8 @@ const THE_STATE = {
 		{
 			owner: "steamnoid",
 			name: "ai-sdlc-os-selfaware",
+			what_it_is: "a copy the system briefs itself against",
+			a_copy_of: "ai-sdlc-os",
 			url: "https://github.com/steamnoid/ai-sdlc-os-selfaware",
 			a_copy_of: "ai-sdlc-os",
 			was_read: true,

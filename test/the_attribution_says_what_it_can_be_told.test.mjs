@@ -20,6 +20,7 @@ const a_project = (the_issues = [], the_pull_requests = []) => ({
 	owner: "steamnoid",
 	name: "a_project",
 	url: "https://github.com/steamnoid/a_project",
+	what_it_is: "a copy the system briefs itself against",
 	a_copy_of: "the-project-it-copies",
 	was_read: true,
 	why_not: null,
@@ -110,7 +111,7 @@ describe("the family-wide counts, over a family that has nothing in it", () => {
 			]),
 		]);
 
-		assert.equal(the_counts.how_many_merged, 2, "an open pull request is counted as a delivery");
+		assert.equal(the_counts.how_many_were_merged, 2, "an open pull request is counted as a delivery");
 		assert.equal(the_counts.how_many_were_delivered_by_a_run, 0);
 	});
 
@@ -169,7 +170,7 @@ describe("a state that was not read, and a state that read nothing", () => {
 			],
 		});
 
-		assert.equal(the_page.the_projects.length, 2, "a project that could not be read was dropped from the family");
-		assert.match(the_page.the_projects[1].why_not, /403/);
+		assert.equal(the_page.the_copies.length, 2, "a project that could not be read was dropped from the family");
+		assert.match(the_page.the_copies[1].why_not, /403/);
 	});
 });
