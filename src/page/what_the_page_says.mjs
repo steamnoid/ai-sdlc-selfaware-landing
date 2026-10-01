@@ -153,6 +153,19 @@ export function what_the_originals_hold(the_originals) {
 		how_many_originals: the_originals.length,
 		how_many_were_read: the_read.length,
 		how_many_issues: the_read.reduce((a_total, a_project) => a_total + a_project.the_issues.length, 0),
+		/**
+		 * **How many of them are still open, which is not the same question.**
+		 *
+		 * The section holding the originals counted merged pull requests and deliveries and never
+		 * mentioned an issue at all, so a reader who reached the bottom of this page could not say
+		 * whether any repository the system was built in had work outstanding. A total of issues on
+		 * its own does not answer that: a repository with one closed issue and a repository with one
+		 * open issue print the same cell.
+		 */
+		how_many_issues_are_open: the_read.reduce(
+			(a_total, a_project) => a_total + a_project.the_issues.filter((an_issue) => an_issue.state === "open").length,
+			0,
+		),
 		how_many_pull_requests: the_pull_requests.length,
 		how_many_were_merged: the_pull_requests.filter((a_pull) => a_pull.was_merged !== null).length,
 		how_many_were_delivered_by_a_run: the_pull_requests.filter((a_pull) => is_a_delivery_branch(a_pull.branch)).length,

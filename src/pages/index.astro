@@ -410,7 +410,8 @@ const when_was_it_read = the_state.the_build?.read_at
 						</h2>
 						<p class="mt-4 text-[15px] leading-7 text-zinc-600 max-w-2xl">
 							{what_the_originals_hold.how_many_pull_requests} pull requests across {what_the_originals_hold.how_many_originals} originals, {what_the_originals_hold.how_many_were_merged} merged,
-							{what_the_originals_hold.how_many_were_delivered_by_a_run} pull requests a run made on them. This is where the system was built, so these are people's
+							{what_the_originals_hold.how_many_were_delivered_by_a_run} pull requests a run made on them, and
+							{what_the_originals_hold.how_many_issues_are_open} open of {what_the_originals_hold.how_many_issues} on their trackers. This is where the system was built, so these are people's
 							changes to the code, and <strong class="font-medium text-zinc-900">not added to the counts
 							above</strong> — not one of them is on a branch a delivery uses, which is the only evidence on this page
 							that a run made it.
@@ -423,6 +424,7 @@ const when_was_it_read = the_state.the_build?.read_at
 										<th class="py-2 pr-4 font-medium">Original</th>
 										<th class="py-2 pr-4 font-medium">Copied into</th>
 										<th class="py-2 pr-4 font-medium">Issues</th>
+										<th class="py-2 pr-4 font-medium">Open</th>
 										<th class="py-2 pr-4 font-medium">Pull requests</th>
 										<th class="py-2 pr-4 font-medium">Merged</th>
 										<th class="py-2 font-medium">Says of itself</th>
@@ -440,6 +442,13 @@ const when_was_it_read = the_state.the_build?.read_at
 													: "nothing was copied from it"}
 											</td>
 											<td class="py-2 pr-4 tabular-nums">{a_project.the_loop.how_many_issues}</td>
+											<!-- **Spelled out, not a bare figure.** A cell of open issues with no total beside it
+											     is a number nobody can act on, so this one says which of how many. -->
+											<td class="py-2 pr-4 tabular-nums">
+												{a_project.the_loop.how_many_issues === 0
+													? "—"
+													: `the ${a_project.the_loop.how_many_issues_are_open} open ${a_project.the_loop.how_many_issues_are_open === 1 ? "issue" : "issues"} of ${a_project.the_loop.how_many_issues}`}
+											</td>
 											<td class="py-2 pr-4 tabular-nums">{a_project.the_loop.how_many_pull_requests}</td>
 											<td class="py-2 pr-4 tabular-nums">{a_project.the_loop.how_many_were_merged}</td>
 											<td class="py-2 text-zinc-600">
