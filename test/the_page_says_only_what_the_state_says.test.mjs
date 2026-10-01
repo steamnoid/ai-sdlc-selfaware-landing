@@ -11,13 +11,13 @@
  */
 
 import { strict as assert } from "node:assert";
-import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
+import { build_the_page, the_words_on_the_page } from "./build_the_page.mjs";
 import { what_the_page_says } from "../src/page/what_the_page_says.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -93,67 +93,31 @@ const THE_STATE = {
 	],
 };
 
-/** Build the page from a state, and hand back the path and the words. */
+/** The page built from a state, through the family's shared build helper. */
 function the_page_built_from(a_state) {
 	const a_directory = mkdtempSync(join(tmpdir(), "ai-sdlc-selfaware-"));
-	const the_state_file = join(at, "src", "state", "the_family.json");
-	const there_was_a_state = existsSync(the_state_file);
-	const what_was_there = there_was_a_state ? readFileSync(the_state_file, "utf8") : null;
-	const what_was_in_the_directory = what_the_state_directory_holds();
-
-	if (a_state !== null) {
-		mkdirSync(join(at, "src", "state"), { recursive: true });
-		writeFileSync(the_state_file, `${JSON.stringify(a_state, null, "\t")}\n`);
-	} else {
-		rmSync(join(at, "src", "state"), { recursive: true, force: true });
-	}
-	try {
-		const the_build = spawnSync(
-			process.execPath,
-			[join(at, "node_modules", "astro", "bin", "astro.mjs"), "build", "--outDir", a_directory],
-			{ cwd: at, encoding: "utf8" },
-		);
-		assert.equal(the_build.status, 0, `the page did not build, and said:\n${the_build.stdout}\n${the_build.stderr}`);
-		return {
-			where: join(a_directory, "index.html"),
-			markup: readFileSync(join(a_directory, "index.html"), "utf8"),
-			words: the_words_in(readFileSync(join(a_directory, "index.html"), "utf8")),
-			also_written: existsSync(join(a_directory, "the_family.json")),
-			afterwards: () => {
-				rmSync(a_directory, { recursive: true, force: true });
-			},
-		};
-	} finally {
-		put_the_directory_back(what_was_in_the_directory);
-		if (what_was_there !== null) {
-			mkdirSync(join(at, "src", "state"), { recursive: true });
-			writeFileSync(the_state_file, what_was_there);
-		}
-	}
-}
-
-/** Every file in the state directory, so the tree is put back as it was found. */
-function what_the_state_directory_holds() {
-	const a_directory = join(at, "src", "state");
-	if (!existsSync(a_directory)) {
-		return [];
-	}
-	return readdirSync(a_directory).map((a_name) => [a_name, readFileSync(join(a_directory, a_name), "utf8")]);
-}
-
-function put_the_directory_back(what_was_there) {
-	const a_directory = join(at, "src", "state");
+	const where_it_lands = a_state === null
+		? build_the_page(at, a_directory, { none: true })
+		: build_the_page(at, a_directory, { write: a_state });
+	/** Everything is read before the directory goes, because a helper that returns a path into a
+	 * directory this function then deletes is a path to nothing. */
+	const what_the_build_said = {
+		where: where_it_lands,
+		markup: readFileSync(where_it_lands, "utf8"),
+		words: the_words_on_the_page(where_it_lands),
+		also_written: existsSync(join(a_directory, "the_family.json")),
+	};
 	rmSync(a_directory, { recursive: true, force: true });
-	if (what_was_there.length === 0) {
-		return;
-	}
-	mkdirSync(a_directory, { recursive: true });
-	for (const [a_name, what_it_held] of what_was_there) {
-		writeFileSync(join(a_directory, a_name), what_it_held);
-	}
+	return what_the_build_said;
 }
 
-/** The words of a piece of markup, with every tag turned into a space. */
+/**
+ * Markup as words.
+ *
+ * **Not the shared helper's function, which reads a path.** One test here looks at a *slice* of the
+ * page — the lines around a hand-named pull request — and asking for a file to read back for a
+ * fragment of a string already in hand would be a round trip to nowhere.
+ */
 function the_words_in(a_piece_of_markup) {
 	return a_piece_of_markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 }
