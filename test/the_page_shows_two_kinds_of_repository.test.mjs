@@ -138,6 +138,29 @@ function the_page_from(a_family) {
 	}
 }
 
+/**
+ * One row of the **originals'** table, as its cells read — so a column can be checked on its own.
+ *
+ * **Scoped to the section, and not searched across the page.** The first version looked for the
+ * name anywhere and found it in the copies' table, in the "a copy of …" column — so it compared an
+ * original's expected row against a copy's actual one and reported the two kinds of repository as
+ * disagreeing. A lookup that can land on the wrong kind of thing is not a lookup.
+ */
+function the_row_of(a_piece_of_markup, a_name) {
+	const the_section = a_piece_of_markup.slice(a_piece_of_markup.indexOf('id="originals"'));
+	const where_it_starts = the_section.indexOf(`>${a_name}<`);
+	const the_row = the_section.slice(
+		the_section.lastIndexOf("<tr", where_it_starts),
+		the_section.indexOf("</tr>", where_it_starts),
+	);
+	return [...the_row.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((a_match) =>
+		html_unescaped(a_match[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()),
+	);
+}
+
+const html_unescaped = (a_piece_of_markup) =>
+	a_piece_of_markup.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, "&");
+
 /** The figures that are about the workflow, and which the originals must not move. */
 const the_figures_about_the_workflow = (a_page) => ({
 	copies_in_the_title: a_page.markup.match(/— (\d+) copies/)?.[1],
@@ -210,16 +233,53 @@ describe("the section for the originals", () => {
 		);
 	});
 
-	it("tells an open issue from a closed one in every row, as the copies' table above does", () => {
+	/**
+	 * **The Open column is a number and nothing else.**
+	 *
+	 * It said "the 1 open issue of 1" for one run, on the reasoning that a bare figure could not be
+	 * acted on without its total. But the Issues column immediately to its left *is* that total, the
+	 * copies' table above prints a bare figure in the same column, and every other column in this
+	 * table is a bare figure — so the phrase was the only cell in the table that had to be read
+	 * rather than scanned, and it said less than its neighbour did.
+	 */
+	it("puts a plain number in the Open column, as every other column in this table does", () => {
 		const the_one_with_issues = THE_ORIGINALS[0];
 		const how_many_of_its_issues_are_open = the_one_with_issues.the_issues.filter(
 			(an_issue) => an_issue.state === "open",
 		).length;
+
+		const the_row = the_row_of(the_page.markup, the_one_with_issues.name);
+		assert.deepEqual(
+			the_row,
+			[
+				the_one_with_issues.name,
+				`${the_one_with_issues.name} was copied into a_copy_number_1`,
+				String(the_one_with_issues.the_issues.length),
+				String(how_many_of_its_issues_are_open),
+				"30",
+				"30",
+				// **This original is the one with no description**, on purpose — a second test asserts
+				// the page says so in words rather than leaving the cell empty. The expectation is
+				// taken from the fixture for the same reason every other number here is: writing the
+				// wrong description in by hand is the mistake the fixture exists to catch.
+				the_one_with_issues.what_it_says_it_is ?? "this repository has no description on GitHub",
+			],
+			"the row is not what this table's columns say it should be. Open is a plain count " +
+				"alongside the total in Issues, and the two are different numbers — one issue open out " +
+				"of two — which is the only situation in which the column says anything.",
+		);
+		assert.doesNotMatch(
+			the_page.words,
+			/the \d+ open issues? of \d+/,
+			"a cell spells itself out where every other cell in the table is a figure",
+		);
+	});
+
+	it("tells an open issue from a closed one in every row, as the copies' table above does", () => {
 		assert.match(
 			the_page.words,
-			new RegExp(`the ${how_many_of_its_issues_are_open} open issues? of ${the_one_with_issues.the_issues.length}`),
-			"no row says which of an original's issues is still open, so the Issues column is a total " +
-				"that cannot be acted on. The copies' table carries an Open column for exactly this.",
+			/The originals these copies were made from/,
+			"the originals' table is not on the page at all, so there is no Open column in it",
 		);
 	});
 
