@@ -16,13 +16,26 @@ import { what_the_page_says } from "../page/what_the_page_says.mjs";
 
 const the_page = what_the_page_says(the_state);
 const the_attribution = the_page.the_attribution;
-const the_projects = the_page.the_projects;
-const the_could_not_be_read = the_projects.filter((a_project) => a_project.was_read !== true);
 
-/** How many items of one kind the whole family holds, counted from the items themselves. */
-const how_many_issues = the_projects.reduce((a_total, a_project) => a_total + a_project.the_loop.how_many_issues, 0);
-const how_many_open_issues = the_projects.reduce((a_total, a_project) => a_total + a_project.the_loop.how_many_issues_are_open, 0);
-const how_many_pull_requests = the_projects.reduce((a_total, a_project) => a_total + a_project.the_loop.how_many_pull_requests, 0);
+/**
+ * **Two lists, and every sum below walks one of them and never both.**
+ *
+ * `the_copies` are the repositories the system briefs itself against, and their trackers are where
+ * a run's work lands. `the_originals` are the repositories the copies were made from, and their
+ * trackers hold the human work of building the system — hundreds of merged pull requests, none on
+ * a branch a delivery uses. Adding them together would make this page claim more than four hundred
+ * deliveries, which is the number `test/the_two_kinds_are_never_added_together.test.mjs` exists to
+ * make impossible.
+ */
+const the_copies = the_page.the_copies ?? [];
+const the_originals = the_page.the_originals ?? [];
+const what_the_originals_hold = the_page.what_the_originals_hold ?? null;
+const the_could_not_be_read = [...the_copies, ...the_originals].filter((a_project) => a_project.was_read !== true);
+
+/** How many items of one kind the copies hold, counted from the items themselves. */
+const how_many_issues = the_copies.reduce((a_total, a_project) => a_total + a_project.the_loop.how_many_issues, 0);
+const how_many_open_issues = the_copies.reduce((a_total, a_project) => a_total + a_project.the_loop.how_many_issues_are_open, 0);
+const how_many_pull_requests = the_copies.reduce((a_total, a_project) => a_total + a_project.the_loop.how_many_pull_requests, 0);
 
 {/** How many items of any kind a copy's tracker holds, counted from the items. */}
 function every_item_count(a_project) {
@@ -43,7 +56,8 @@ function how_many_more(how_many, how_many_shown) {
  * `ai-sdlc-landing` four hand-written numbers became false the day a repository answered 404, and the
  * fifth was wrong on the live site the day it was written. A number word is a number nobody counts.
  */
-const how_many_copies = the_page.verdict === "read" ? the_page.the_projects.length : 0;
+const how_many_copies = the_copies.length;
+const how_many_originals = the_originals.length;
 
 const when_was_it_read = the_state.the_build?.read_at
 	? new Date(the_state.the_build.read_at).toISOString().slice(0, 16).replace("T", " ") + " UTC"
@@ -108,9 +122,14 @@ const when_was_it_read = the_state.the_build?.read_at
 						<p class="mt-5 text-[17px] leading-7 text-zinc-600 max-w-2xl">
 							<span class="font-medium text-zinc-900">ai-sdlc</span> is a system that reads a public
 							repository, asks bounded questions about it, has a person approve every answer, and
-							delivers a pull request. {how_many_copies} of the projects on this page exist to be its target: each is
-							a copy of a project it was written from, and the copy is the point — it is where a run's
-							findings and a run's deliveries land.
+							delivers a pull request.
+						</p>
+						<p class="mt-3 text-[17px] leading-7 text-zinc-600 max-w-2xl">
+							{how_many_copies + how_many_originals} repositories, {how_many_copies} of them working on
+							themselves: each is a copy of one of the others, and its own tracker is where a run's
+							findings and a run's deliveries land — that is what the copy is for. The remaining {how_many_originals} are
+							the projects the copies were made from; their numbers are counted separately, further down,
+							and never added to the destinations above.
 						</p>
 						<p class="mt-4 text-[17px] leading-7 text-zinc-600 max-w-2xl">
 							What each copy has produced is below, read from its tracker rather than written here.
@@ -120,7 +139,7 @@ const when_was_it_read = the_state.the_build?.read_at
 							{[
 								{ the_number: the_attribution.how_many_projects_were_read, the_label: `copies, of ${the_attribution.how_many_projects_were_asked_about} asked about` },
 								{ the_number: how_many_issues, the_label: `issues on their trackers, ${how_many_open_issues} still open` },
-								{ the_number: how_many_pull_requests, the_label: `pull requests, ${the_attribution.how_many_merged} merged` },
+								{ the_number: how_many_pull_requests, the_label: `pull requests, ${the_attribution.how_many_were_merged} merged` },
 								{ the_number: the_attribution.how_many_were_delivered_by_a_run, the_label: "pull requests a run can be shown to have made" },
 							].map((a_count) => (
 								<div class="rounded-2xl border border-zinc-200 p-4">
@@ -135,7 +154,7 @@ const when_was_it_read = the_state.the_build?.read_at
 				{/*
 				 * The finding first, and in its own section, because it governs how every number below
 				 * is read. A page headed "what the workflow delivered" would be claiming all
-				 * {the_attribution.how_many_merged} merged pull requests are deliveries, and nothing in these
+				 * {the_attribution.how_many_were_merged} merged pull requests are deliveries, and nothing in these
 				 * trackers would let a reader tell that claim from a hand-written commit.
 				 */}
 				<section id="attribution" class="scroll-mt-14 border-b border-zinc-200 bg-white">
@@ -145,17 +164,32 @@ const when_was_it_read = the_state.the_build?.read_at
 							What these trackers cannot tell you
 						</h2>
 						<p class="mt-2 text-[15px] text-zinc-600 max-w-2xl">
-							Each copy's own description says the system works on it. That is the only statement
-							anywhere on this page about who writes there, and it is a statement the repository
-							makes about itself. Beyond it, these trackers hold three signals, and here is what
-							each one turned out to be worth.
+							<!--
+								**This sentence used to say what every description says, and it is gone.**
+
+								"It is the only statement anywhere on this page about who writes there" was true
+								about the six copies this page started with, and every one of their descriptions
+								says in its own words that the system works on it. The seventh does not: it
+								describes isolation and pairwise testing and says nothing of the sort. So the
+								sentence became false the moment a repository was added, and it was false
+								*because* it was about the data rather than about the page.
+
+								What replaces it is a claim this page can actually keep — that each repository's
+								description is quoted as it stands, further down, and that the statements about
+								authorship on this page are the repositories' and not ours. A description that
+								says nothing is printed as one that says nothing.
+							-->
+							Every repository below is quoted describing itself, in its own words and unedited.
+							The statements about who writes there are the repositories' and not this page's.
+							Beyond that, the copies' trackers hold three signals, and here is what each one
+							turned out to be worth.
 						</p>
 						<div class="mt-6 grid md:grid-cols-3 gap-3">
 							<div class="rounded-2xl border border-zinc-200 p-5">
 								<p class="text-[13px] text-zinc-500">Pull requests on a delivery branch</p>
 								<p class="mt-2 text-2xl font-semibold tabular-nums">
 									{the_attribution.how_many_were_delivered_by_a_run}
-									<span class="text-base font-normal text-zinc-400">of {the_attribution.how_many_merged}</span>
+									<span class="text-base font-normal text-zinc-400">of {the_attribution.how_many_were_merged}</span>
 								</p>
 								<p class="mt-3 text-[13px] leading-6 text-zinc-600">
 									<code class="font-mono text-[12px]">ai-sdlc-os</code> names its deliveries
@@ -171,10 +205,10 @@ const when_was_it_read = the_state.the_build?.read_at
 									{the_attribution.how_many_people_wrote_anything}
 								</p>
 								<p class="mt-3 text-[13px] leading-6 text-zinc-600">
-									One account is the author of every issue and every pull request on all {how_many_copies}
+									One account is the author of every issue and every pull request on all {how_many_copies} copies'
 										trackers
 									trackers, so <em>author</em> separates nothing. The system pushes as the person who is
-									operating it, which is also true of the commits on all {how_many_copies}, and no tracker records
+									operating it, which is also true of the commits on all {how_many_copies} copies, and no tracker records
 									the difference.
 								</p>
 							</div>
@@ -225,7 +259,7 @@ const when_was_it_read = the_state.the_build?.read_at
 									</tr>
 								</thead>
 								<tbody>
-									{the_projects.map((a_project) => (
+									{the_copies.map((a_project) => (
 										<tr class="border-b border-zinc-100 last:border-0 align-top">
 											<td class="py-2 pr-4 font-mono text-[12px] whitespace-nowrap">
 												<a class="underline underline-offset-2" href={a_project.url}>{a_project.name}</a>
@@ -264,7 +298,7 @@ const when_was_it_read = the_state.the_build?.read_at
 						<p class="text-xs uppercase tracking-wider text-zinc-500">Each copy</p>
 						<h2 class="mt-3 text-2xl font-semibold tracking-tight">What is on each tracker</h2>
 						<div class="mt-6 space-y-3">
-							{the_projects.map((a_project) => (
+							{the_copies.map((a_project) => (
 								<div class="rounded-2xl border border-zinc-200 p-5">
 									<div class="flex items-start justify-between gap-3">
 										<p class="font-mono text-sm font-medium">
@@ -353,6 +387,70 @@ const when_was_it_read = the_state.the_build?.read_at
 									)}
 								</div>
 							))}
+						</div>
+					</div>
+				</section>
+
+				{/*
+					The originals.
+
+					**A separate section because these numbers are not deliveries, and because a reader
+					who had to work that out for themselves would be doing the arithmetic this page
+					refuses to do.** The originals are where the system was built, so their trackers are
+					full of merged pull requests and not one of them is on a branch a delivery uses. Put
+					those figures beside the copies' — or, worse, inside the same totals — and the page
+					would claim four hundred deliveries. So they are counted here, labelled, and the
+					sentence under the heading says in words that they are not added to the counts above.
+				*/}
+				<section id="originals" class="scroll-mt-14 border-t border-zinc-200 bg-white">
+					<div class="max-w-6xl mx-auto px-6 py-12 md:py-16">
+						<p class="text-xs uppercase tracking-wider text-zinc-500">The originals</p>
+						<h2 class="mt-3 text-2xl font-semibold tracking-tight">
+							The originals these copies were made from
+						</h2>
+						<p class="mt-4 text-[15px] leading-7 text-zinc-600 max-w-2xl">
+							{what_the_originals_hold.how_many_pull_requests} pull requests across {what_the_originals_hold.how_many_originals} originals, {what_the_originals_hold.how_many_were_merged} merged,
+							{what_the_originals_hold.how_many_were_delivered_by_a_run} pull requests a run made on them. This is where the system was built, so these are people's
+							changes to the code, and <strong class="font-medium text-zinc-900">not added to the counts
+							above</strong> — not one of them is on a branch a delivery uses, which is the only evidence on this page
+							that a run made it.
+						</p>
+
+						<div class="mt-8 overflow-x-auto">
+							<table class="w-full text-sm">
+								<thead>
+									<tr class="border-b border-zinc-200 text-left text-zinc-500">
+										<th class="py-2 pr-4 font-medium">Original</th>
+										<th class="py-2 pr-4 font-medium">Copied into</th>
+										<th class="py-2 pr-4 font-medium">Issues</th>
+										<th class="py-2 pr-4 font-medium">Pull requests</th>
+										<th class="py-2 pr-4 font-medium">Merged</th>
+										<th class="py-2 font-medium">Says of itself</th>
+									</tr>
+								</thead>
+								<tbody>
+									{the_originals.map((a_project) => (
+										<tr class="border-b border-zinc-100 last:border-0 align-top">
+											<td class="py-2 pr-4 font-mono text-[12px] whitespace-nowrap">
+												<a href={a_project.url} class="hover:text-zinc-600 underline underline-offset-2">{a_project.name}</a>
+											</td>
+											<td class="py-2 pr-4 text-[12px] text-zinc-600">
+												{a_project.was_written_from?.length > 0
+													? `${a_project.name} was copied into ${a_project.was_written_from.join(", ")}`
+													: "nothing was copied from it"}
+											</td>
+											<td class="py-2 pr-4 tabular-nums">{a_project.the_loop.how_many_issues}</td>
+											<td class="py-2 pr-4 tabular-nums">{a_project.the_loop.how_many_pull_requests}</td>
+											<td class="py-2 pr-4 tabular-nums">{a_project.the_loop.how_many_were_merged}</td>
+											<td class="py-2 text-zinc-600">
+												{a_project.why_it_has_no_description
+													? a_project.why_it_has_no_description
+													: a_project.what_it_says_it_is}
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</section>
