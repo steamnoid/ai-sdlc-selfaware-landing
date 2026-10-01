@@ -1,0 +1,20 @@
+# The state is a build artefact and is never committed.
+#
+# **A committed snapshot is a number nobody checked**, and every step of the build reports
+# success while it happens. This page is built from what the collector read, so the file
+# that records what it read is not source.
+src/state/
+
+# A checkout of the repository the page is published from, if there is one.
+build/
+
+# **No trailing slash on node_modules, because a symlink is not a directory.**
+# A trailing slash matches directories only, and a checkout that reuses its sibling's
+# installed packages makes a symlink — so `node_modules/` ignores nothing and a commit
+# of a checkout carries a second one into it, several hundred thousand paths.
+node_modules
+dist/
+.astro/
+
+# macOS
+.DS_Store

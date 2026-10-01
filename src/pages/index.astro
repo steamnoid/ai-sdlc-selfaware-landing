@@ -1,0 +1,353 @@
+---
+/**
+ * Six copies of the ai-sdlc system, and what each one has produced since it began working on
+ * itself. Every number here was read out of a GitHub tracker at build time.
+ *
+ * **The first thing this page says is what it cannot tell you.** A page about what a workflow
+ * delivered invites the question "delivered by what, though" — and on these six trackers there
+ * is nothing that answers it: no pull request sits on a branch a delivery uses, one account wrote
+ * every item, and only five of fifty-two carry the shape the filing agent writes. So the page
+ * prints the counts and refuses the authorship, and it does that in the first section rather than
+ * in a footnote, because a reader who has been told the authorship is coming has been told
+ * something false.
+ */
+import the_state from "../state/the_family.json";
+import { what_the_page_says } from "../page/what_the_page_says.mjs";
+
+const the_page = what_the_page_says(the_state);
+const the_attribution = the_page.the_attribution;
+const the_projects = the_page.the_projects;
+const the_could_not_be_read = the_projects.filter((a_project) => a_project.was_read !== true);
+
+/** How many items of one kind the whole family holds, counted from the items themselves. */
+const how_many_issues = the_projects.reduce((a_total, a_project) => a_total + a_project.the_loop.how_many_issues, 0);
+const how_many_open_issues = the_projects.reduce((a_total, a_project) => a_total + a_project.the_loop.how_many_issues_are_open, 0);
+const how_many_pull_requests = the_projects.reduce((a_total, a_project) => a_total + a_project.the_loop.how_many_pull_requests, 0);
+
+{/** How many items of any kind a copy's tracker holds, counted from the items. */}
+function every_item_count(a_project) {
+	return a_project.open_issues.length + a_project.closed_issues.length +
+		a_project.merged_pull_requests.length + a_project.unmerged_pull_requests.length;
+}
+
+/** "and 20 more", which is a count and not a feeling about there being more. */
+function how_many_more(how_many, how_many_shown) {
+	return how_many - how_many_shown;
+}
+
+const when_was_it_read = the_state.the_build?.read_at
+	? new Date(the_state.the_build.read_at).toISOString().slice(0, 16).replace("T", " ") + " UTC"
+	: null;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<title>ai-sdlc, working on itself — six copies</title>
+		<meta
+			name="description"
+			content="Six copies of the ai-sdlc system, each the copy the system briefs itself against. What each has filed and delivered, read from the trackers, and what the trackers cannot say about who wrote it."
+		/>
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://steamnoid.github.io/ai-sdlc-selfaware-landing" />
+		<meta property="og:title" content="ai-sdlc, working on itself — six copies" />
+		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}/favicon.svg`} />
+		<style>
+			@import "tailwindcss";
+		</style>
+	</head>
+	<body class="bg-white text-zinc-900 antialiased">
+		<header class="border-b border-zinc-200">
+			<div class="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between gap-3 text-xs text-zinc-500">
+				<a href="https://github.com/steamnoid/ai-sdlc-selfaware-landing" class="hover:text-zinc-900 transition">
+					ai-sdlc — working on itself
+				</a>
+				<nav class="flex gap-3">
+					<a href="#attribution" class="hover:text-zinc-900 transition">What this cannot tell you</a>
+					<a href="#loop" class="hover:text-zinc-900 transition">The loop</a>
+					<a href="#family" class="hover:text-zinc-900 transition">Each copy</a>
+				</nav>
+			</div>
+		</header>
+
+		{the_page.verdict === "read" ? (
+			<main>
+				<section class="border-b border-zinc-200">
+					<div class="max-w-6xl mx-auto px-6 py-12 md:py-16">
+						<p class="text-xs uppercase tracking-wider text-zinc-500">Six copies</p>
+						<h1 class="mt-3 text-4xl md:text-5xl font-semibold tracking-tight">
+							The system, working on copies of itself
+						</h1>
+						<p class="mt-5 text-[17px] leading-7 text-zinc-600 max-w-2xl">
+							<span class="font-medium text-zinc-900">ai-sdlc</span> is a system that reads a public
+							repository, asks bounded questions about it, has a person approve every answer, and
+							delivers a pull request. Six of the projects on this page exist to be its target: each is
+							a copy of a project it was written from, and the copy is the point — it is where a run's
+							findings and a run's deliveries land.
+						</p>
+						<p class="mt-4 text-[17px] leading-7 text-zinc-600 max-w-2xl">
+							What each copy has produced is below, read from its tracker rather than written here.
+							{when_was_it_read !== null && <> Read {when_was_it_read}.</>}
+						</p>
+						<dl class="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl">
+							{[
+								{ the_number: the_attribution.how_many_projects_were_read, the_label: `copies, of ${the_attribution.how_many_projects_were_asked_about} asked about` },
+								{ the_number: how_many_issues, the_label: `issues on their trackers, ${how_many_open_issues} still open` },
+								{ the_number: how_many_pull_requests, the_label: `pull requests, ${the_attribution.how_many_merged} merged` },
+								{ the_number: the_attribution.how_many_were_delivered_by_a_run, the_label: "pull requests a run can be shown to have made" },
+							].map((a_count) => (
+								<div class="rounded-2xl border border-zinc-200 p-4">
+									<dd class="text-3xl font-semibold tabular-nums">{a_count.the_number}</dd>
+									<dt class="mt-1 text-[12px] text-zinc-500 leading-snug">{a_count.the_label}</dt>
+								</div>
+							))}
+						</dl>
+					</div>
+				</section>
+
+				{/*
+				 * The finding first, and in its own section, because it governs how every number below
+				 * is read. A page headed "what the workflow delivered" would be claiming all
+				 * {the_attribution.how_many_merged} merged pull requests are deliveries, and nothing in these
+				 * trackers would let a reader tell that claim from a hand-written commit.
+				 */}
+				<section id="attribution" class="scroll-mt-14 border-b border-zinc-200 bg-white">
+					<div class="max-w-6xl mx-auto px-6 py-12 md:py-16">
+						<p class="text-xs uppercase tracking-wider text-zinc-500">Read this before the counts</p>
+						<h2 class="mt-3 text-2xl font-semibold tracking-tight">
+							What these trackers cannot tell you
+						</h2>
+						<p class="mt-2 text-[15px] text-zinc-600 max-w-2xl">
+							Each copy's own description says the system works on it. That is the only statement
+							anywhere on this page about who writes there, and it is a statement the repository
+							makes about itself. Beyond it, these trackers hold three signals, and here is what
+							each one turned out to be worth.
+						</p>
+						<div class="mt-6 grid md:grid-cols-3 gap-3">
+							<div class="rounded-2xl border border-zinc-200 p-5">
+								<p class="text-[13px] text-zinc-500">Pull requests on a delivery branch</p>
+								<p class="mt-2 text-2xl font-semibold tabular-nums">
+									{the_attribution.how_many_were_delivered_by_a_run}
+									<span class="text-base font-normal text-zinc-400">of {the_attribution.how_many_merged}</span>
+								</p>
+								<p class="mt-3 text-[13px] leading-6 text-zinc-600">
+									<code class="font-mono text-[12px]">ai-sdlc-os</code> names its deliveries
+									<code class="font-mono text-[12px]">aisdlc/issue-&lt;n&gt;-&lt;run id&gt;</code>, so a pull
+									request on such a branch was made by a run. Not one on the six is on a branch like
+									that — every merged one is named after what it changed, which is what a person pushing
+									a branch calls it.
+								</p>
+							</div>
+							<div class="rounded-2xl border border-zinc-200 p-5">
+								<p class="text-[13px] text-zinc-500">People who wrote anything</p>
+								<p class="mt-2 text-2xl font-semibold tabular-nums">
+									{the_attribution.how_many_people_wrote_anything}
+								</p>
+								<p class="mt-3 text-[13px] leading-6 text-zinc-600">
+									One account is the author of every issue and every pull request on all six
+									trackers, so <em>author</em> separates nothing. The system pushes as the person who is
+									operating it, which is also true of the commits on all six, and no tracker records
+									the difference.
+								</p>
+							</div>
+							<div class="rounded-2xl border border-zinc-200 p-5">
+								<p class="text-[13px] text-zinc-500">Items carrying the filing agent's shape</p>
+								<p class="mt-2 text-2xl font-semibold tabular-nums">
+									{the_attribution.how_many_carry_the_filings_shape}
+									<span class="text-base font-normal text-zinc-400">of {the_attribution.how_many_items}</span>
+								</p>
+								<p class="mt-3 text-[13px] leading-6 text-zinc-600">
+									One repository's filings carry a heading and named sections. The largest set of issues
+									here is one line of prose each, with neither. A shape is evidence and not a record: a
+									person who copied it would be counted here too.
+								</p>
+							</div>
+						</div>
+						<p class="mt-6 text-[15px] leading-7 text-zinc-600 max-w-2xl">
+							So every count below is a count of what a tracker holds, and this page says
+							<strong class="font-medium text-zinc-900">cannot be told from the tracker</strong> wherever
+							the tracker does not record who wrote a thing. It does not say the work was done by a person
+							— only that nothing here would let a reader tell, which is a smaller claim and the only one
+							the evidence carries.
+						</p>
+					</div>
+				</section>
+
+				<section id="loop" class="scroll-mt-14 border-b border-zinc-200">
+					<div class="max-w-6xl mx-auto px-6 py-12 md:py-16">
+						<p class="text-xs uppercase tracking-wider text-zinc-500">The loop</p>
+						<h2 class="mt-3 text-2xl font-semibold tracking-tight">
+							What each copy has produced, and what it says about itself
+						</h2>
+						<p class="mt-2 text-[15px] text-zinc-600 max-w-2xl">
+							A copy's description is quoted as it stands on GitHub, in its own words and not
+							translated, because that is the only evidence about authorship on this page.
+						</p>
+						<div class="mt-6 overflow-x-auto">
+							<table class="w-full text-sm">
+								<thead>
+									<tr class="border-b border-zinc-200 text-left text-xs text-zinc-500">
+										<th class="py-2 pr-4 font-medium">Copy</th>
+										<th class="py-2 pr-4 font-medium">Of</th>
+										<th class="py-2 pr-4 font-medium">Issues</th>
+										<th class="py-2 pr-4 font-medium">Open</th>
+										<th class="py-2 pr-4 font-medium">Pull requests</th>
+										<th class="py-2 pr-4 font-medium">Merged</th>
+										<th class="py-2 font-medium">Says of itself</th>
+									</tr>
+								</thead>
+								<tbody>
+									{the_projects.map((a_project) => (
+										<tr class="border-b border-zinc-100 last:border-0 align-top">
+											<td class="py-2 pr-4 font-mono text-[12px] whitespace-nowrap">
+												<a class="underline underline-offset-2" href={a_project.url}>{a_project.name}</a>
+												{a_project.a_copy_of !== null && (
+													<span class="block text-[11px] text-zinc-400">
+														a copy of{" "}
+														<a
+															class="underline underline-offset-2"
+															href={`https://github.com/steamnoid/${a_project.a_copy_of}`}
+														>
+															{a_project.a_copy_of}
+														</a>
+													</span>
+												)}
+											</td>
+											<td class="py-2 pr-4 text-zinc-500 text-[12px]">{a_project.was_created_on?.slice(0, 10) ?? "—"}</td>
+											<td class="py-2 pr-4 tabular-nums">{a_project.the_loop.how_many_issues}</td>
+											<td class="py-2 pr-4 tabular-nums">{a_project.the_loop.how_many_issues_are_open}</td>
+											<td class="py-2 pr-4 tabular-nums">{a_project.the_loop.how_many_pull_requests}</td>
+											<td class="py-2 pr-4 tabular-nums">{a_project.the_loop.how_many_were_merged}</td>
+											<td class="py-2 text-zinc-600 text-[12px] leading-5 max-w-sm">
+												{a_project.was_read === true && a_project.what_it_says_it_is !== null
+													? `"${a_project.what_it_says_it_is}"`
+													: <span class="italic text-amber-700">not read — {a_project.why_not}</span>}
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</section>
+
+				<section id="family" class="scroll-mt-14">
+					<div class="max-w-6xl mx-auto px-6 py-12 md:py-16">
+						<p class="text-xs uppercase tracking-wider text-zinc-500">Each copy</p>
+						<h2 class="mt-3 text-2xl font-semibold tracking-tight">What is on each tracker</h2>
+						<div class="mt-6 space-y-3">
+							{the_projects.map((a_project) => (
+								<div class="rounded-2xl border border-zinc-200 p-5">
+									<div class="flex items-start justify-between gap-3">
+										<p class="font-mono text-sm font-medium">
+											<a class="underline underline-offset-2" href={a_project.url}>{a_project.name}</a>
+										</p>
+										<a
+											class="text-[12px] text-zinc-500 hover:text-zinc-900 transition"
+											href={`https://github.com/steamnoid/${a_project.name}/issues`}
+										>
+											the tracker
+										</a>
+									</div>
+
+									{a_project.was_read !== true && (
+										<p class="mt-3 text-[13px] text-amber-700">
+											not read — {a_project.why_not}
+										</p>
+									)}
+
+									{a_project.was_read === true && (
+										<>
+											<p class="mt-3 text-[13px] leading-6 text-zinc-600">
+												"{a_project.what_it_says_it_is}"
+											</p>
+
+											{/*
+											 * **Nothing is printed under a heading that has nothing under it.** A copy
+											 * whose tracker is empty says so in one sentence — which is a finding about the
+											 * family and is the reason this section exists rather than a gap.
+											 */}
+											{every_item_count(a_project) === 0 ? (
+												<p class="mt-4 text-[13px] text-amber-700">
+													Its tracker holds nothing: no issue and no pull request. That is a fact about
+													the copy, printed rather than left as a section with nothing in it.
+												</p>
+											) : (
+												<div class="mt-4 grid md:grid-cols-2 gap-4">
+													<div>
+														<p class="text-xs uppercase tracking-wider text-zinc-500">
+															Open issues — {a_project.open_issues.length}
+														</p>
+														{a_project.open_issues.length === 0 ? (
+															<p class="mt-2 text-[13px] text-zinc-500 italic">none</p>
+														) : (
+															<ul class="mt-2 space-y-1">
+																{a_project.open_issues.slice(0, 12).map((an_issue) => (
+																	<li class="text-[13px] text-zinc-700 flex gap-2">
+																		<span class="text-zinc-400 tabular-nums shrink-0">#{an_issue.number}</span>
+																		<span class="line-clamp-2">{an_issue.title}</span>
+																	</li>
+																))}
+																{a_project.open_issues.length > 12 && (
+																	<li class="text-[13px] text-zinc-500">
+																		{how_many_more(a_project.open_issues.length, 12)} more
+																	</li>
+																)}
+															</ul>
+														)}
+													</div>
+													<div>
+														<p class="text-xs uppercase tracking-wider text-zinc-500">
+															Merged pull requests — {a_project.merged_pull_requests.length}
+														</p>
+														{a_project.merged_pull_requests.length === 0 ? (
+															<p class="mt-2 text-[13px] text-zinc-500 italic">none</p>
+														) : (
+															<ul class="mt-2 space-y-1">
+																{a_project.merged_pull_requests.map((a_pull) => (
+																	<li class="text-[13px] text-zinc-700 flex gap-2">
+																		<span class="text-zinc-400 tabular-nums shrink-0">#{a_pull.number}</span>
+																		<span class="line-clamp-2">{a_pull.title}</span>
+																	</li>
+																))}
+															</ul>
+														)}
+														{a_project.unmerged_pull_requests.length > 0 && (
+															<p class="mt-2 text-[13px] text-amber-700">
+																{a_project.unmerged_pull_requests.length} pull request
+																{a_project.unmerged_pull_requests.length === 1 ? "" : "s"} open and not merged
+															</p>
+														)}
+													</div>
+												</div>
+											)}
+										</>
+									)}
+								</div>
+							))}
+						</div>
+					</div>
+				</section>
+			</main>
+		) : (
+			<main class="max-w-3xl mx-auto px-6 py-16">
+				<h1 class="text-3xl font-semibold tracking-tight">No state, so nothing to say</h1>
+				<p class="mt-4 text-zinc-600 text-[15px] leading-7">{the_page.why_not}</p>
+			</main>
+		)}
+
+		<footer class="border-t border-zinc-200">
+			<div class="max-w-6xl mx-auto px-6 py-8 flex flex-wrap items-center gap-3 text-xs text-zinc-500">
+				<span>© 2026 Krzysztof Paliga</span>
+				<span class="ml-auto flex gap-3">
+					<span>No tracking</span>
+					<span>No cookies</span>
+					<span>Nothing hand-typed</span>
+				</span>
+			</div>
+		</footer>
+	</body>
+</html>
+

@@ -1,0 +1,26 @@
+{
+  "name": "ai-sdlc-selfaware-landing",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "test": "node --test --test-concurrency=1 test/",
+    "collect": "node scripts/ask_the_trackers.mjs --github-api \"${GITHUB_API:-https://api.github.com}\"",
+    "gate": "./scripts/gate"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.2",
+    "tailwindcss": "^4.3.3"
+  },
+  "allowScripts": {
+    "esbuild": true
+  }
+}

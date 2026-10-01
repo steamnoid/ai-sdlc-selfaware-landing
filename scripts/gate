@@ -1,0 +1,23 @@
+#!/bin/sh
+# The gate for this repository: the suite, and a build of the page with no state at all.
+#
+# **No network and no credential.** The default suite reaches none, and the second half proves the
+# build every fresh clone does — the one that has never run here, because the state is a build
+# artefact and is never committed. The reading of the six trackers happens in CI, where the token
+# Actions mints is already there; requiring a credential to check a change would mean the gate
+# only runs for whoever has one.
+
+set -eu
+
+here=$(cd "$(dirname "$0")/.." && pwd)
+cd "$here"
+
+echo "── the suite: no network, no credential ──"
+node --test --test-concurrency=1 test/
+
+echo
+echo "── the build a fresh clone does, with no state ──"
+node node_modules/astro/bin/astro.mjs build --outDir "$(mktemp -d)/dist"
+
+echo
+echo "gate: green"
