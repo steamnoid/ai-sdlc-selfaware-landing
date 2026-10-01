@@ -83,7 +83,20 @@ const the_state_the_page_is_built_from = {
 
 export default defineConfig({
 	site: 'https://steamnoid.github.io',
-	base: '/ai-sdlc-landing',
+	/**
+	 * Where this page is served from, and **one value per repository in the family.**
+	 *
+	 * **It said `/ai-sdlc-landing`, and this page was published unstyled for three runs.** This
+	 * config was copied from a sibling and the address came with it, and every asset the page asks
+	 * for was then requested from a repository that is not this one: the stylesheet 404'd, the
+	 * favicon 404'd, and the page rendered as a wall of unstyled text while every test in the
+	 * repository passed — because a class name in the markup is true whether or not the stylesheet
+	 * that applies it was ever served.
+	 *
+	 * There is now a test that fails on any file the build did not produce, so a copied address is
+	 * a red run rather than a quiet deployment.
+	 */
+	base: '/ai-sdlc-selfaware-landing',
 	build: { format: 'file' },
 	integrations: [the_state_the_page_is_built_from],
 	vite: {
